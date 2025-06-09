@@ -23,6 +23,16 @@
     {
       inherit name packages shellHook;
     };
+    packages.${system}.default = pkgs.stdenv.mkDerivation {
+      name = "git";
+      src = ./.;
+      buildPhase = "true";
+      installPhase = ''
+        mkdir -p $out/bin
+        cp ./bsecret.sh $out/bin/.
+        chmod +x $out/bin/bsecret.sh
+      '';
+    };
   };
 }
 
