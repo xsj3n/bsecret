@@ -28,8 +28,9 @@
       src = ./.;
       buildPhase = "true";
       installPhase = ''
+        echo "Directory: $(pwd)"
         mkdir -p $out/bin
-        cp ./bsecret.sh $out/bin/.
+        cp bsecret.sh $out/bin/.
         chmod +x $out/bin/bsecret.sh
       '';
     };
