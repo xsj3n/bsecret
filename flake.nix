@@ -16,11 +16,12 @@
       gh
       bash-language-server
     ];
+    shellHook = "alias git='./git_wrapper.sh'";
   in
   {
     devShells."${system}".default = pkgs.mkShell
     {
-      inherit name packages;
+      inherit name packages shellHook;
     };
   };
 }
