@@ -32,7 +32,6 @@ directory_decrypt() {
 # encrypt every file matching the pattern, skipping those that end w/ .gpg
 # $1 = pattern | $2+ = staged_files 
 encrypt_pattern() {
-  [[ -z "$staged_files" ]] && return 1
   local -n staged_files_ref="$staged_files"
   mapfile -t repo_files < <(find . -type f -name "$1" | xargs -n1 basename 2>/dev/null)
   for file in "${repo_files[@]}"; do
