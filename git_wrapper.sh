@@ -39,8 +39,7 @@ encrypt_pattern() {
  
     gpg --encrypt --recipient xsj3n@tutanota.com --yes --trust-model always --output "$file.gpg" "$file"
 
-    git restore --staged "$file"
-    rm "$file"
+    git rm --cached "$file"
     git add "$file.gpg"
   done
 }
@@ -68,4 +67,4 @@ gpg_files=(*.gpg)
 if [[ ${#gpg_files[@]} -eq 0  ]]; then
   exit
 fi
-directory_decrypt
+rm ./*.gpg
