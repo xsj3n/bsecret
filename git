@@ -42,5 +42,5 @@ for pattern in "${secret_file_patterns[@]}"; do
 done
 
 "$git_path" commit --amend --no-edit
-"$git_path" "${@:2}"
+"$git_path" "$@"
 directory_decrypt
