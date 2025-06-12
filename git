@@ -26,10 +26,8 @@ encrypt_pattern() {
     gpg --encrypt --recipient "$recipient" --yes --trust-model always --output "$file.gpg" "$file"
 
     echo " encrypt mode - $file"
-    echo "running: $git_path rm --cached $file &>/dev/null"
-    echo "running : $git_path $file.gpg"
     "$git_path" rm --cached "$file" &>/dev/null 
-    "$git_path" "$file.gpg"
+    "$git_path" add "$file.gpg"
   done
 }
 
