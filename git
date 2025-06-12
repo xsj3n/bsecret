@@ -11,7 +11,7 @@ directory_decrypt() {
   mapfile -t gpg_files < <(find . -type f -name "*.gpg")
   for file in "${gpg_files[@]}"; do
     gpg --decrypt "$file" > "${file:0:-4}"
-    touch -r "$file" "${$file:0:-4}"
+    touch -r "$file" "${file:0:-4}"
     rm "$file"
   done
 }
