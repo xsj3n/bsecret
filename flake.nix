@@ -29,8 +29,8 @@
       buildPhase = "true";
       installPhase = ''
         mkdir -p $out/bin
-        cp bsecret.sh $out/bin/.
-        chmod +x $out/bin/bsecret.sh
+        cp git $out/bin/.
+        chmod +x $out/bin/git
       '';
     };
   };
