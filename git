@@ -1,3 +1,7 @@
+if [[ "-is-bsecret" == "$" ]]; then
+  echo "git <> bsecret is active"
+  exit 0 
+fi
 if [[ "push" != "$1" ]] ; then
   git "$@"
   exit "$?"
