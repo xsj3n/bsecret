@@ -3,7 +3,7 @@ if [[ "-is-bsecret" == "$1" ]]; then
   exit 0 
 fi
 if [[ "push" != "$1" ]] ; then
-  git "$@"
+  "$git_path" "$@"
   exit "$?"
 fi
 
@@ -25,8 +25,8 @@ encrypt_pattern() {
     gpg --encrypt --recipient xsj3n@tutanota.com --yes --trust-model always --output "$file.gpg" "$file"
 
     echo " encrypt mode - $file"
-    git rm --cached "$file" &>/dev/null 
-    git add "$file.gpg"
+    "$git_path" rm --cached "$file" &>/dev/null 
+    "$git_path" "$file.gpg"
   done
 }
 
@@ -40,6 +40,6 @@ for pattern in "${secret_file_patterns[@]}"; do
   encrypt_pattern "$pattern" staged_files
 done
 
-git commit --amend --no-edit
-git push "${@:2}"
+"$git_path" commit --amend --no-edit
+"$git_path" "${@:2}"
 directory_decrypt

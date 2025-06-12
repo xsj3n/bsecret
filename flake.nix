@@ -28,7 +28,7 @@
       src = ./.;
       buildPhase = "true";
       installPhase = ''
-        git_path="$(which git)"
+        git_path="${pkgs.git}/bin/git"
         sed -i "1i git_path=\"$git_path\"" git
         mkdir -p $out/bin
         cp git $out/bin/.
