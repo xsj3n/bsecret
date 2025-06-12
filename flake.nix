@@ -32,7 +32,6 @@
         cp bsecret.sh $out/bin/.
         chmod +x $out/bin/bsecret.sh
       '';
-    default = self.packages.${system}.git-bsecret; 
     };
   };
 }
