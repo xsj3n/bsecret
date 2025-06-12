@@ -1,5 +1,5 @@
-if [[ "-is-bsecret" == "$" ]]; then
-  echo "git <> bsecret is active"
+if [[ "-is-bsecret" == "$1" ]]; then
+  echo "git-bsecret is active"
   exit 0 
 fi
 if [[ "push" != "$1" ]] ; then
