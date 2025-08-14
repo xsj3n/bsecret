@@ -58,9 +58,8 @@ if [ -z "$repo_root" ]; then
 fi
 
 mapfile -t config_lines < "$repo_root/.gitsecret"
-secret_file_patterns=("${config_lines[@]:1}")
 type="${config_lines[0]}"
-echo "TYPE: $type"
+
 
 if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
   if ! [ -s "$repo_root/.sops.yaml" ]; then
@@ -71,13 +70,16 @@ if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
    mapfile -t secret_file_patterns < <(grep -e "path_regex" .sops.yaml | grep -o '"[^"]*"')
   for i in "${!secret_file_patterns[@]}"; do
     secret_file_patterns[$i]="${secret_file_patterns[$i]:1:-1}"
-  done 
+  done
+  for pattern in "${secret_file_patterns[@]}"; do
+    encrypt_pattern "$pattern" staged_files
+  done
+else
+  secret_file_patterns=("${config_lines[@]:1}")
+  for pattern in "${secret_file_patterns[@]}"; do
+    encrypt_pattern "$pattern" staged_files
+  done
 fi
-
-printf "PATTERNS: \n%s" "${secret_file_patterns[@]}"
-for pattern in "${secret_file_patterns[@]}"; do
-  encrypt_pattern "$pattern" staged_files
-done
 
 "$git_path" commit --amend --no-edit
 "$git_path" "$@"
