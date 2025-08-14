@@ -60,7 +60,7 @@ fi
 mapfile -t config_lines < "$repo_root/.gitsecret"
 type="${config_lines[0]}"
 
-
+echo "TYPE: $type"
 if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
   if ! [ -s "$repo_root/.sops.yaml" ]; then
     echo "error: if TYPE is set to sops then a .sops.yaml must be present and not empty"
