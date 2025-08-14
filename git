@@ -58,7 +58,7 @@ if [ -z "$repo_root" ]; then
 fi
 
 mapfile -t config_lines < "$repo_root/.gitsecret"
-type="${config_lines[0]}"
+type="${config_lines[0]:5}"
 
 echo "TYPE: $type"
 if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
