@@ -1,0 +1,11 @@
+creation_rules:
+  - path_regex: ".*\\.secrets\\..*"
+    pgp: '958A9B51558B863CF72DCFF2DAA5AB60B28DAA77'
+    encrypted_regex: '^(.*passwd.*|.*secret.*|.*token.*)$'
+
+creation_rules:
+  - path_regex: ".*\\.key\\..*"
+    pgp: '958A9B51558B863CF72DCFF2DAA5AB60B28DAA77'
+    encrypted_regex: '^(.*passwd.*|.*secret.*|.*token.*)$'
+  
+

@@ -14,6 +14,7 @@
     
     packages = with pkgs; [
       gh
+      sops
       bash-language-server
     ];
     shellHook = "alias git='./git_wrapper.sh'";
