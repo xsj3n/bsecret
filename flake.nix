@@ -17,7 +17,7 @@
       sops
       bash-language-server
     ];
-    shellHook = "alias git='./git_wrapper.sh'";
+    shellHook = "alias git='./git'";
   in
   {
     devShells."${system}".default = pkgs.mkShell
@@ -29,8 +29,6 @@
       src = ./.;
       buildPhase = "true";
       installPhase = ''
-        git_path="${pkgs.git}/bin/git"
-        sed -i "1i git_path=\"$git_path\"" git
         mkdir -p $out/bin
         cp git $out/bin/.
         chmod +x $out/bin/git
