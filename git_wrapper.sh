@@ -60,7 +60,7 @@ fi
 mapfile -t config_lines < "$repo_root/.gitsecret"
 secret_file_patterns=("${config_lines[@]:1}")
 type="${config_lines[0]}"
-
+echo "TYPE: $type"
 
 if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
   if ! [ -s "$repo_root/.sops.yaml" ]; then
@@ -68,13 +68,10 @@ if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
     exit 1
   fi
 
-  echo "[SOPS]: secret check starting..."
-  mapfile -t secret_file_patterns < <(grep -e "path_regex" .sops.yaml | grep -o '"[^"]*"')
+   mapfile -t secret_file_patterns < <(grep -e "path_regex" .sops.yaml | grep -o '"[^"]*"')
   for i in "${!secret_file_patterns[@]}"; do
     secret_file_patterns[$i]="${secret_file_patterns[$i]:1:-1}"
-  done
-else
-  echo "[GPG]: secret check starting..."  
+  done 
 fi
 
 
