@@ -71,6 +71,7 @@ if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
   for i in "${!secret_file_patterns[@]}"; do
     secret_file_patterns[$i]="${secret_file_patterns[$i]:1:-1}"
   done
+  echo "Patterns: ${secret_file_patterns[*]}"
   for pattern in "${secret_file_patterns[@]}"; do
     encrypt_pattern "$pattern" staged_files
   done
