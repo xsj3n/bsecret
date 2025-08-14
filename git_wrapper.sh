@@ -74,7 +74,7 @@ if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
   done 
 fi
 
-
+printf "PATTERNS: \n%s" "${secret_file_patterns[@]}"
 for pattern in "${secret_file_patterns[@]}"; do
   encrypt_pattern "$pattern" staged_files
 done
