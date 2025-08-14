@@ -50,9 +50,7 @@ encrypt_pattern() {
   done
 }
 
-echo "secret check starting..."
 shopt -s nullglob
-
 repo_root="$(git rev-parse --show-toplevel)"
 if [ -z "$repo_root" ]; then
   echo "error: .gitsecret file must be present in repository root"
@@ -69,10 +67,14 @@ if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
     echo "error: if TYPE is set to sops then a .sops.yaml must be present and not empty"
     exit 1
   fi
+
+  echo "[SOPS]: secret check starting..."
   mapfile -t secret_file_patterns < <(grep -e "path_regex" .sops.yaml | grep -o '"[^"]*"')
   for i in "${!secret_file_patterns[@]}"; do
     secret_file_patterns[$i]="${secret_file_patterns[$i]:1:-1}"
   done
+else
+  echo "[GPG]: secret check starting..."  
 fi
 
 
