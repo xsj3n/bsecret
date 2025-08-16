@@ -35,7 +35,7 @@ decrypt() {
     local output_type
     output_type=$(basename "$1" | split_on_period)
     echo "type out: $output_type"
-    sops --output-type "$output_type" "$1" --decrypt "$1" > "${1:0:-4}"   
+    sops --output-type "$output_type" --decrypt "$1" > "${1:0:-4}"   
   fi
 }
 
