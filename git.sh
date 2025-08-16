@@ -9,6 +9,14 @@ if [[ "push" != "$1" ]] ; then
   exit "$?"
 fi
 
+split_on_period() {
+  while IFS= read -r line; do
+    IFS='.' read -ra split_array <<< "$line"
+    echo "${split_array[${#split_array[@]} - 2]}"
+  done
+}
+
+
 
 
 type=""
@@ -24,7 +32,10 @@ decrypt() {
   if [[ "$type" == "gpg" ]]; then
     gpg --decrypt "$1" > "${1:0:-4}"
   else
-    sops --decrypt "$1" > "${1:0:-4}"   
+    local output_type
+    output_type=$(basename "$1" | split_on_period)
+    echo "type out: $output_type"
+    sops --output-type "$output_type" "$1" --decrypt "$1" > "${1:0:-4}"   
   fi
 }
 
@@ -41,7 +52,7 @@ directory_decrypt() {
 recipient="$(gpg --list-key | grep -Eo '[^ ]+@[^ ]+' | cut -c2- | rev | cut -c2- | rev)"
 encrypt_pattern() {
   echo "Start pattern encryption"
-  pattern="${1//\\\\/\\}"
+  local pattern="${1//\\\\/\\}"
   mapfile -t repo_files < <(find . -type f -regex "$pattern")
   for file in "${repo_files[@]}"; do
     [[ "${file:0:-4}" == ".gpg" ]] && continue 
