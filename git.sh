@@ -41,8 +41,8 @@ directory_decrypt() {
 recipient="$(gpg --list-key | grep -Eo '[^ ]+@[^ ]+' | cut -c2- | rev | cut -c2- | rev)"
 encrypt_pattern() {
   echo "Start pattern encryption"
-  mapfile -t repo_files < <(find . -type f -regex "$1")
-  echo "files: ${repo_files[@]}"
+  pattern="${1//\\\\/\\}"
+  mapfile -t repo_files < <(find . -type f -regex "$pattern")
   for file in "${repo_files[@]}"; do
     [[ "${file:0:-4}" == ".gpg" ]] && continue 
     encrypt "$file" "$recipient"
@@ -62,14 +62,15 @@ fi
 mapfile -t config_lines < "$repo_root/.gitsecret"
 type="${config_lines[0]:5}"
 
-echo "TYPE: $type"
+
 if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
   if ! [ -s "$repo_root/.sops.yaml" ]; then
     echo "error: if TYPE is set to sops then a .sops.yaml must be present and not empty"
     exit 1
   fi
-
-   mapfile -t secret_file_patterns < <(grep -e "path_regex" .sops.yaml | grep -o '"[^"]*"')
+  
+  echo "[SOPS]: secrets check starting"
+  mapfile -t secret_file_patterns < <(grep -e "path_regex" .sops.yaml | grep -o '"[^"]*"')
   for i in "${!secret_file_patterns[@]}"; do
     secret_file_patterns[$i]="${secret_file_patterns[$i]:1:-1}"
   done
@@ -78,6 +79,7 @@ if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
     encrypt_pattern "$pattern" staged_files
   done
 else
+  echo "[GPG]: secrets check starting"
   secret_file_patterns=("${config_lines[@]:1}")
   for pattern in "${secret_file_patterns[@]}"; do
     encrypt_pattern "$pattern" staged_files
