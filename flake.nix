@@ -17,7 +17,7 @@
       sops
       bash-language-server
     ];
-    shellHook = "alias git='./git'";
+    shellHook = "alias git='./git.sh'";
   in
   {
     devShells."${system}".default = pkgs.mkShell

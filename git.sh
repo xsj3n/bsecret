@@ -42,6 +42,7 @@ recipient="$(gpg --list-key | grep -Eo '[^ ]+@[^ ]+' | cut -c2- | rev | cut -c2-
 encrypt_pattern() {
   echo "Start pattern encryption"
   mapfile -t repo_files < <(find . -type f -regex "$1")
+  echo "files: ${repo_files[@]}"
   for file in "${repo_files[@]}"; do
     [[ "${file:0:-4}" == ".gpg" ]] && continue 
     encrypt "$file" "$recipient"
