@@ -34,7 +34,6 @@ decrypt() {
   else
     local output_type
     output_type=$(basename "$1" | split_on_period)
-    echo "type out: $output_type"
     sops --output-type "$output_type" --decrypt "$1" > "${1:0:-4}"   
   fi
 }
@@ -51,7 +50,6 @@ directory_decrypt() {
 
 recipient="$(gpg --list-key | grep -Eo '[^ ]+@[^ ]+' | cut -c2- | rev | cut -c2- | rev)"
 encrypt_pattern() {
-  echo "Start pattern encryption"
   local pattern="${1//\\\\/\\}"
   mapfile -t repo_files < <(find . -type f -regex "$pattern")
   for file in "${repo_files[@]}"; do
