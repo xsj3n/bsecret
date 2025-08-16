@@ -14,6 +14,6 @@ The first line should either be:
 - TYPE=SOPS
 - TYPE=GPG
 
-If SOPS is specified, no secret file patterns need to be defined as the patterns will be read from the `.sops.yaml` file.
+If SOPS is specified, no secret file patterns need to be defined as the patterns will be read from the `.sops.yaml` file. Decryption output types will be based on second to last string seperated by periods, such as `file.secrets.json.gpg` -> `json` output type. 
 
 If GPG is specified, each line after the first will be treated as a secret file regex pattern. 
