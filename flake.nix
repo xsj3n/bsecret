@@ -17,12 +17,11 @@
       sops
       bash-language-server
     ];
-    shellHook = "alias git='./git'";
   in
   {
     devShells."${system}".default = pkgs.mkShell
     {
-      inherit name packages shellHook;
+      inherit name packages;
     };
 
     packages.${system}.default = pkgs.stdenv.mkDerivation {

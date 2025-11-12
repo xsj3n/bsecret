@@ -3,7 +3,7 @@ if [[ "-is-bsecret" == "$1" ]]; then
   exit 0 
 fi
 
-git_path="$(which git)"
+git_path="$(type -a git | grep -v 'bsecret')"
 if [[ "push" != "$1" ]] ; then
   "$git_path" "$@"
   exit "$?"
