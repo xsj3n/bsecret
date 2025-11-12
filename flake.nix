@@ -17,21 +17,22 @@
       sops
       bash-language-server
     ];
-    shellHook = "alias git='./bsecret-git.sh'";
+    shellHook = "alias git='./git'";
   in
   {
     devShells."${system}".default = pkgs.mkShell
     {
       inherit name packages shellHook;
     };
+
     packages.${system}.default = pkgs.stdenv.mkDerivation {
       name = "bsecret-git";
       src = ./.;
       buildPhase = "true";
       installPhase = ''
         mkdir -p $out/bin
-        cp bsecret-git.sh $out/bin/.
-        chmod +x $out/bin/bsecret-git.sh
+        cp ./git $out/bin/.
+        chmod +x $out/bin/git
       '';
     };
   };
