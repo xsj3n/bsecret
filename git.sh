@@ -54,7 +54,7 @@ directory_decrypt() {
 recipient="$(gpg --list-key | grep -Eo '[^ ]+@[^ ]+' | cut -c2- | rev | cut -c2- | rev)"
 encrypt_pattern() {
   local pattern="${1//\\\\/\\}"
-  mapfile -t repo_files < <(find . -type f -regex "$pattern")
+  mapfile -t repo_files < <(find . -name f -regex "$pattern")
   for file in "${repo_files[@]}"; do
     [[ "${file:0:-4}" == ".gpg" ]] && continue 
     encrypt "$file" "$recipient"
