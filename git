@@ -54,7 +54,9 @@ directory_decrypt() {
 recipient="$(gpg --list-key | grep -Eo '[^ ]+@[^ ]+' | cut -c2- | rev | cut -c2- | rev)"
 encrypt_pattern() {
   local pattern="${1//\\\\/\\}"
-  mapfile -t repo_files < <(find . -name f -name "$pattern")
+  echo "[SOPS]: Starting encryption pattern - $pattern"
+  mapfile -t repo_files < <(find . -type f -regex "$pattern")
+  echo "[SOPS]: Discovered files: ${repo_files[@]}"
   for file in "${repo_files[@]}"; do
     [[ "${file:0:-4}" == ".gpg" ]] && continue 
     encrypt "$file" "$recipient"
@@ -89,6 +91,11 @@ if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
   for pattern in "${secret_file_patterns[@]}"; do
     encrypt_pattern "$pattern" staged_files
   done
+
+  if [ ${#config_lines[@]} -gt 1 ]; then
+    # encrypt all none compatible secret files in .gitsecret below the type 
+  fi
+
 else
   echo "[GPG]: secrets check starting"
   secret_file_patterns=("${config_lines[@]:1}")
