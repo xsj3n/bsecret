@@ -23,16 +23,18 @@ split_on_period() {
 
 
 type=""
+# $1 = filename | $2 = gpg_recipient |$3 = type 
 encrypt() {
-  if [[ "$type" == "gpg" ]]; then
+  if [[ "$3" == "gpg" ]]; then
     gpg --encrypt --recipient "$2" --yes --trust-model always --output "$1.gpg" "$1"
   else
     sops --encrypt "$1" > "$1.gpg"   
   fi
 }
 
+# $1 = filename | $2 = type 
 decrypt() {
-  if [[ "$type" == "gpg" ]]; then
+  if [[ "$2" == "gpg" ]]; then
     gpg --decrypt "$1" > "${1:0:-4}"
   else
     local output_type
@@ -41,28 +43,39 @@ decrypt() {
   fi
 }
 
+# $1 = filename 
+git_replace() {
+    "$git_path" rm --cached "$1" &>/dev/null 
+    "$git_path" add "$1.gpg"
+}
 
 directory_decrypt() {
   mapfile -t gpg_files < <(find . -type f -name "*.gpg")
   for file in "${gpg_files[@]}"; do
-    decrypt "$file"
+    decrypt "$file" "$type"
     touch -r "$file" "${file:0:-4}"
     rm "$file"
   done
 }
 
 recipient="$(gpg --list-key | grep -Eo '[^ ]+@[^ ]+' | cut -c2- | rev | cut -c2- | rev)"
+# $1 = pattern | $2 = type 
 encrypt_pattern() {
   local pattern="${1//\\\\/\\}"
   echo "[SOPS]: Starting encryption pattern - $pattern"
-  mapfile -t repo_files < <(find . -type f -regex "$pattern")
+  
+  if [ "$type" == "gpg" ]; then
+    mapfile -t repo_files < <(find . -type f -name "$pattern")
+  elif [ "$type" == "sops" ]; then
+    mapfile -t repo_files < <(find . -type f -regex "$pattern")
+  fi
+
   echo "[SOPS]: Discovered files: ${repo_files[@]}"
   for file in "${repo_files[@]}"; do
     [[ "${file:0:-4}" == ".gpg" ]] && continue 
-    encrypt "$file" "$recipient"
+    encrypt "$file" "$recipient" "$2"
     echo " encrypt mode - $file"
-    "$git_path" rm --cached "$file" &>/dev/null 
-    "$git_path" add "$file.gpg"
+    git_replace "$file"
   done
 }
 
@@ -75,8 +88,6 @@ fi
 
 mapfile -t config_lines < "$repo_root/.gitsecret"
 type="${config_lines[0]:5}"
-
-
 if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
   if ! [ -s "$repo_root/.sops.yaml" ]; then
     echo "error: if TYPE is set to sops then a .sops.yaml must be present and not empty"
@@ -89,18 +100,21 @@ if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
     secret_file_patterns[$i]="${secret_file_patterns[$i]:1:-1}"
   done
   for pattern in "${secret_file_patterns[@]}"; do
-    encrypt_pattern "$pattern" staged_files
+    encrypt_pattern "$pattern" "sops"
   done
 
   if [ ${#config_lines[@]} -gt 1 ]; then
-    # encrypt all none compatible secret files in .gitsecret below the type 
+    # encrypt all none compatible secret files in .gitsecret below the type
+    for pattern in "${config_lines[@]:1}"; do
+      encrypt_pattern "$pattern" "gpg"
+    done
   fi
 
 else
   echo "[GPG]: secrets check starting"
   secret_file_patterns=("${config_lines[@]:1}")
   for pattern in "${secret_file_patterns[@]}"; do
-    encrypt_pattern "$pattern" staged_files
+    encrypt_pattern "$pattern" "gpg"
   done
 fi
 

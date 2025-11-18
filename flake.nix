@@ -30,7 +30,7 @@
       buildPhase = "true";
       installPhase = ''
         mkdir -p $out/bin
-        cp ./git $out/bin/.
+        cp ./git.sh $out/bin/git
         chmod +x $out/bin/git
       '';
     };
