@@ -62,6 +62,7 @@ recipient="$(gpg --list-key | grep -Eo '[^ ]+@[^ ]+' | cut -c2- | rev | cut -c2-
 # $1 = pattern | $2 = type 
 encrypt_pattern() {
   local pattern="${1//\\\\/\\}"
+  local repo_files=""
   echo "[SOPS]: Starting encryption pattern - $pattern"
   
   if [ "$type" == "gpg" ]; then
@@ -119,6 +120,7 @@ else
   done
 fi
 
+echo "======================"
 "$git_path" commit --amend --no-edit
 "$git_path" "$@"
 directory_decrypt
