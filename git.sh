@@ -27,7 +27,7 @@ encrypt() {
   if [[ "$3" == "gpg" ]]; then
     gpg --encrypt --recipient "$2" --yes --trust-model always --output "$1.gpg" "$1"
   else
-    sops --encrypt "$1" > "$1.gpg"   
+    sops --encrypt "$1" > "$1.gpg"
   fi
 }
 
@@ -38,7 +38,7 @@ decrypt() {
   else
     local output_type
     output_type=$(basename "$1" | split_on_period)
-    sops --output-type "$output_type" --decrypt "$1" > "${1:0:-4}"   
+    sops --output-type "$output_type" --decrypt "$1" > "${1:0:-4}" 2>/dev/null || gpg --decrypt "$1" > "${1:0:-4}" 
   fi
 }
 
@@ -71,7 +71,7 @@ encrypt_pattern() {
     mapfile -t repo_files < <(find . -type f -regex "$pattern")
   fi
 
-  echo "[${2^^}]: Discovered files: ${repo_files[@]}"
+  #echo "[${2^^}]: Discovered files: ${repo_files[@]}"
   for file in "${repo_files[@]}"; do
     [[ "${file:0:-4}" == ".gpg" ]] && continue 
     encrypt "$file" "$recipient" "$2"
