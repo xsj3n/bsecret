@@ -106,6 +106,7 @@ if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
   if [ ${#config_lines[@]} -gt 1 ]; then
     # encrypt all none compatible secret files in .gitsecret below the type
     for pattern in "${config_lines[@]:1}"; do
+      echo "Unsupported files listed in configuration, fallking back to gpg"
       encrypt_pattern "$pattern" "gpg"
     done
   fi
