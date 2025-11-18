@@ -1,5 +1,5 @@
 if [[ "-is-bsecret" == "$1" ]]; then
-  echo "<> <> git-bsecret is active <> <>"
+  echo "[SOPS <|> GPG] bsecret is available"
   exit 0 
 fi
 
@@ -21,8 +21,7 @@ split_on_period() {
 
 
 
-
-type=""
+# type=""
 # $1 = filename | $2 = gpg_recipient |$3 = type 
 encrypt() {
   if [[ "$3" == "gpg" ]]; then
@@ -49,6 +48,7 @@ git_replace() {
     "$git_path" add "$1.gpg"
 }
 
+# need to find a way to pass the proper type to decrypt, unless mixed decryptions will fail 
 directory_decrypt() {
   mapfile -t gpg_files < <(find . -type f -name "*.gpg")
   for file in "${gpg_files[@]}"; do
@@ -63,15 +63,15 @@ recipient="$(gpg --list-key | grep -Eo '[^ ]+@[^ ]+' | cut -c2- | rev | cut -c2-
 encrypt_pattern() {
   local pattern="${1//\\\\/\\}"
   local repo_files=""
-  echo "[SOPS]: Starting encryption pattern - $pattern"
+  echo "[${2^^}]: Starting encryption pattern - $pattern"
   
-  if [ "$type" == "gpg" ]; then
+  if [ "$2" == "gpg" ]; then
     mapfile -t repo_files < <(find . -type f -name "$pattern")
-  elif [ "$type" == "sops" ]; then
+  elif [ "$2" == "sops" ]; then
     mapfile -t repo_files < <(find . -type f -regex "$pattern")
   fi
 
-  echo "[SOPS]: Discovered files: ${repo_files[@]}"
+  echo "[${2^^}]: Discovered files: ${repo_files[@]}"
   for file in "${repo_files[@]}"; do
     [[ "${file:0:-4}" == ".gpg" ]] && continue 
     encrypt "$file" "$recipient" "$2"
@@ -106,9 +106,9 @@ if [ "$type" == "sops" ] || [ "$type" == "SOPS" ]; then
 
   if [ ${#config_lines[@]} -gt 1 ]; then
     # encrypt all none compatible secret files in .gitsecret below the type
-    for pattern in "${config_lines[@]:1}"; do
-      echo "Unsupported files listed in configuration, fallking back to gpg"
-      encrypt_pattern "$pattern" "gpg"
+    for basic_pattern in "${config_lines[@]:1}"; do
+      echo "[SOPS -> GPG] Unsupported files listed in configuration, falling back to  GPG"
+      encrypt_pattern "$basic_pattern" "gpg"
     done
   fi
 
