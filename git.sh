@@ -19,9 +19,6 @@ split_on_period() {
   done
 }
 
-
-
-# type=""
 # $1 = filename | $2 = gpg_recipient |$3 = type 
 encrypt() {
   if [[ "$3" == "gpg" ]]; then
@@ -38,7 +35,7 @@ decrypt() {
   else
     local output_type
     output_type=$(basename "$1" | split_on_period)
-    sops --output-type "$output_type" --decrypt "$1" > "${1:0:-4}" 2>/dev/null || gpg --decrypt "$1" > "${1:0:-4}" 
+    sops --output-type "$output_type" --decrypt "$1" > "${1:0:-4}" 2>/dev/null || gpg --decrypt "$1" > "${1:0:-4}" # account for mixed decryptions 
   fi
 }
 
@@ -48,7 +45,6 @@ git_replace() {
     "$git_path" add "$1.gpg"
 }
 
-# need to find a way to pass the proper type to decrypt, unless mixed decryptions will fail 
 directory_decrypt() {
   mapfile -t gpg_files < <(find . -type f -name "*.gpg")
   for file in "${gpg_files[@]}"; do
@@ -59,6 +55,16 @@ directory_decrypt() {
 }
 
 recipient="$(gpg --list-key | grep -Eo '[^ ]+@[^ ]+' | cut -c2- | rev | cut -c2- | rev)"
+mapfile -t ignore_lines < "$repo_root/.gitignore"
+# $1 = path
+is_ignored() {
+  for pattern in "${ignore_lines[@]}"; do
+    [[ "$1" == $pattern ]] && return 1
+  done
+  return 0
+}
+
+
 # $1 = pattern | $2 = type 
 encrypt_pattern() {
   local pattern="${1//\\\\/\\}"
@@ -73,7 +79,9 @@ encrypt_pattern() {
 
   #echo "[${2^^}]: Discovered files: ${repo_files[@]}"
   for file in "${repo_files[@]}"; do
-    [[ "${file:0:-4}" == ".gpg" ]] && continue 
+    [[ "${file:0:-4}" == ".gpg" ]] && continue
+    [[ is_ignored "$file" ]] && continue
+
     encrypt "$file" "$recipient" "$2"
     echo " encrypt mode - $file"
     git_replace "$file"

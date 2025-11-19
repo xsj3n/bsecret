@@ -1,2 +1,1 @@
-./result
-./test
+./tests/*ignore_example.key
