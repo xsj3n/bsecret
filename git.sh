@@ -3,6 +3,8 @@ if [[ "-is-bsecret" == "$1" ]]; then
   exit 0 
 fi
 
+shopt -s nullglob
+repo_root="$(git rev-parse --show-toplevel)"
 git_path="$(type -a git | grep -v 'bsecret')"
 read -ra git_path <<< $git_path
 git_path="${git_path[-1]}"
@@ -80,7 +82,7 @@ encrypt_pattern() {
   #echo "[${2^^}]: Discovered files: ${repo_files[@]}"
   for file in "${repo_files[@]}"; do
     [[ "${file:0:-4}" == ".gpg" ]] && continue
-    [[ is_ignored "$file" ]] && continue
+    if is_ignored "$file"; then continue; fi
 
     encrypt "$file" "$recipient" "$2"
     echo " encrypt mode - $file"
@@ -88,8 +90,6 @@ encrypt_pattern() {
   done
 }
 
-shopt -s nullglob
-repo_root="$(git rev-parse --show-toplevel)"
 if [ -z "$repo_root" ]; then
   echo "error: .gitsecret file must be present in repository root"
   exit 1
