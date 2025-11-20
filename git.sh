@@ -3,16 +3,17 @@ if [[ "-is-bsecret" == "$1" ]]; then
   exit 0 
 fi
 
-shopt -s nullglob
-repo_root="$(git rev-parse --show-toplevel)"
+
 git_path="$(type -a git | grep -v 'bsecret')"
 read -ra git_path <<< $git_path
 git_path="${git_path[-1]}"
-
 if [[ "push" != "$1" ]] ; then
-  "$git_path" "$@"
-  exit "$?"
+  $git_path $@
+  exit $?
 fi
+
+shopt -s nullglob
+repo_root="$(git rev-parse --show-toplevel)"
 
 split_on_period() {
   while IFS= read -r line; do
