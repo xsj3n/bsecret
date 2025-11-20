@@ -1,5 +1,5 @@
 if [[ "-is-bsecret" == "$1" ]]; then
-  echo "[SOPS <|> GPG] bsecret is available"
+  echo "[SOPS <|> GPG] wrapper is active"
   exit 0 
 fi
 
