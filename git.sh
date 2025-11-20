@@ -8,7 +8,7 @@ git_path="$(type -a git | grep -v 'bsecret')"
 read -ra git_path <<< $git_path
 git_path="${git_path[-1]}"
 if [[ "push" != "$1" ]] ; then
-  $git_path $@
+  $git_path "$@"
   exit $?
 fi
 
