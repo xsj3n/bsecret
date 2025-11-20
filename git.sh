@@ -61,9 +61,9 @@ mapfile -t ignore_lines < "$repo_root/.gitignore"
 # $1 = path
 is_ignored() {
   for pattern in "${ignore_lines[@]}"; do
-    [[ "$1" == $pattern ]] && return 1
+    [[ "$1" == $pattern ]] && return 0
   done
-  return 0
+  return 1
 }
 
 
@@ -82,7 +82,10 @@ encrypt_pattern() {
   #echo "[${2^^}]: Discovered files: ${repo_files[@]}"
   for file in "${repo_files[@]}"; do
     [[ "${file:0:-4}" == ".gpg" ]] && continue
-    if is_ignored "$file"; then continue; fi
+    if is_ignored "$file"; then
+      echo " skipping ignored file - $file"
+      continue
+    fi
 
     encrypt "$file" "$recipient" "$2"
     echo " encrypt mode - $file"
